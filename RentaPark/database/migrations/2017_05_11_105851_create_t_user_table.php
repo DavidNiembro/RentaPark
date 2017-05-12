@@ -15,7 +15,7 @@ class CreateTUserTable extends Migration
     {
         Schema::create('t_user', function (Blueprint $table) {
             $table->increments('idUser');
-            $table->string('useUsername',30)->unique();
+            $table->string('useUsername', 30)->unique();
             $table->string('password');
             $table->string('usePictureProfil')->nullable();
             $table->string('useMail')->nullable();

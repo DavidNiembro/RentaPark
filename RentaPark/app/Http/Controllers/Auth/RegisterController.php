@@ -51,7 +51,6 @@ class RegisterController extends Controller
             'useUsername' => 'required|string|max:255|unique:t_user',
             'useMail' => 'required|string|email|max:255|unique:t_user',
             'password' => 'required|string|min:6|confirmed',
-            'usePictureProfil' => 'required',
             'useName' => 'required',
             'useFirstName' => 'required',
             'useCity' => 'required',
