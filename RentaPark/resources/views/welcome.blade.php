@@ -69,25 +69,21 @@
             @if (Route::has('login'))
                 <div class="top-right links">
                     @if (Auth::check())
-                        <a href="{{ url('/home') }}">Home</a>
+                        <a href="{{ url('/Dashboard') }}">Home</a>
                     @else
-                        <a href="{{ url('/login') }}">Login</a>
-                        <a href="{{ url('/register') }}">Register</a>
+                        <a href="{{ url('/login') }}">Se connecter</a>
+                        <a href="{{ url('/register') }}">S'enregister</a>
                     @endif
                 </div>
             @endif
 
             <div class="content">
                 <div class="title m-b-md">
-                    Laravel
-                </div>
-
-                <div class="links">
-                    <a href="https://laravel.com/docs">Documentation</a>
-                    <a href="https://laracasts.com">Laracasts</a>
-                    <a href="https://laravel-news.com">News</a>
-                    <a href="https://forge.laravel.com">Forge</a>
-                    <a href="https://github.com/laravel/laravel">GitHub</a>
+                    <div style="width: 60%;margin-left: auto;margin-right: auto">
+                        <p style="font-size: 30px">Avec RentaPark, cherchez, trouvez et louez les places de particulier en un clic</p>
+                        <input type="text">
+                        <a href="{{ url('/search') }}" style="font-size: medium">Chercher</a>
+                    </div>
                 </div>
             </div>
         </div>

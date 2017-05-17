@@ -65,15 +65,12 @@
         <data-type>varchar(255)</data-type>
       </column>
       <column id="20" parent="4" name="parDelete">
-        <mandatory>1</mandatory>
         <data-type>varchar(255)</data-type>
       </column>
       <column id="21" parent="4" name="parLatitude">
-        <mandatory>1</mandatory>
         <data-type>varchar(255)</data-type>
       </column>
       <column id="22" parent="4" name="parLongitude">
-        <mandatory>1</mandatory>
         <data-type>varchar(255)</data-type>
       </column>
       <column id="23" parent="4" name="parCouvert">
@@ -127,7 +124,7 @@
       <column id="35" parent="6" name="usePictureProfil">
         <data-type>varchar(255)</data-type>
       </column>
-      <column id="36" parent="6" name="useMail">
+      <column id="36" parent="6" name="email">
         <data-type>varchar(255)</data-type>
       </column>
       <column id="37" parent="6" name="useName">
@@ -142,11 +139,13 @@
       <column id="40" parent="6" name="useLand">
         <data-type>varchar(255)</data-type>
       </column>
-      <column id="41" parent="6" name="useToken">
-        <data-type>varchar(255)</data-type>
-      </column>
-      <column id="42" parent="6" name="useVerified">
+      <column id="41" parent="6" name="confirmed">
+        <mandatory>1</mandatory>
         <data-type>tinyint(1)</data-type>
+        <default-expression>&apos;0&apos;</default-expression>
+      </column>
+      <column id="42" parent="6" name="confirmation_code">
+        <data-type>varchar(255)</data-type>
       </column>
       <column id="43" parent="6" name="useDelete">
         <data-type>tinyint(1)</data-type>

@@ -21,8 +21,12 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function dashboard()
     {
-        return view('home');
+        return view('userProfile/dashboard');
+    }
+    public function MyReservations()
+    {
+        return view('userProfile/myReservations');
     }
 }

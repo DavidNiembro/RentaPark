@@ -20,7 +20,7 @@ class User extends Authenticatable
 
     protected $fillable = [
         'useUsername',
-        'useMail',
+        'email',
         'password',
         'usePictureProfil',
         'useFirstName',
@@ -41,4 +41,13 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+    public function park(){
+        return $this->hasMany('App\Park', 'fkUser', 'idUser');
+    }
+
+    public function parkreservation()
+    {
+        return $this->belongsToMany('App\Park', 't_reservation',
+            'fkUser' ,'fkPark' );
+    }
 }

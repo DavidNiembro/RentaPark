@@ -6,9 +6,12 @@
     "type": "project",
     "require": {
         "php": ">=5.6.4",
+        "alexpechkarev/google-maps": "1.0.7",
+        "bestmomo/laravel-email-confirmation": "^1.0",
         "laravel/framework": "5.4.*",
         "laravel/tinker": "~1.0",
-        "laravelcollective/html": "5.*"
+        "laravelcollective/html": "5.*",
+        "maddhatter/laravel-fullcalendar": "^1.2"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

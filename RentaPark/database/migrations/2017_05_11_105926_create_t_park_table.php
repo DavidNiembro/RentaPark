@@ -20,9 +20,9 @@ class CreateTParkTable extends Migration
             $table->string('parPostCode');
             $table->string('parCity');
             $table->string('parPrice');
-            $table->string('parDelete');
-            $table->string('parLatitude');
-            $table->string('parLongitude');
+            $table->string('parDelete')->nullable();
+            $table->string('parLatitude')->nullable();
+            $table->string('parLongitude')->nullable();
             $table->boolean('parCouvert');
             $table->integer('fkUser');
         });
