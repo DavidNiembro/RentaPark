@@ -1,20 +1,23 @@
 @extends('layouts.app')
 
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
+<script type="application/javascript" src={{asset('js/calendarLocal.js')}}></script>
 
 @section('content')
     <body>
     <div class="container">
         <div class="row">
-            <div class="col-md-4">
-                <p>Place n° {!! $Park->parNumber !!}</p>
-                <p>{!! $Park->parAddress !!}</p>
-                <p>{!! $Park->parPostCode !!} {!! $Park->ParCity !!}</p>
-                <p>@if($Park->parCouvert == 1)
+            <div class="col-md-4" style="font-size: xx-large">
+                <p>Place n° {!! $park->parNumber !!}</p>
+                <p>{!! $park->parAddress !!}</p>
+                <p>{!! $park->parPostCode !!} {!! $park->ParCity !!}</p>
+                <p>@if($park->parCouvert == 1)
                         Place couverte
                     @else
                         Place extérieur
                     @endif</p>
-                <p>{!! $Park->parPrice !!}.- / 30 min</p>
+                <p>{!! $park->parPrice !!}.- / 30 min</p>
 
             </div>
             <div class="col-md-8">
@@ -57,8 +60,8 @@
                     </div>
                 </div>
             </div>
-            <input type="hidden" name="PlaceID" value="{{$Park->idPark}}">
-            {!! Form::submit('RESERVER', ['class' => 'btn btn-primary pull-right']) !!}
+            <input type="hidden" name="PlaceID" value="{{$park->idPark}}">
+            {!! Form::submit('RESERVER', ['class' => 'btn btn-danger pull-right']) !!}
             {!! Form::close() !!}
         </div>
         @endif
@@ -66,7 +69,7 @@
 
         <script>
             function myMap() {
-                var myCenter = new google.maps.LatLng({!! $Park->parLatitude !!},{!! $Park->parLongitude !!});
+                var myCenter = new google.maps.LatLng({!! $park->parLatitude !!},{!! $park->parLongitude !!});
                 var mapCanvas = document.getElementById("googleMap");
                 var mapOptions = {center: myCenter, zoom: 12};
                 var map = new google.maps.Map(mapCanvas, mapOptions);

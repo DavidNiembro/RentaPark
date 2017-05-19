@@ -21,9 +21,12 @@
         <script async defer
                 src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAjuZwLfnSa_iayQaFeKmQQThTnh-NP9C8&callback=myMap">
         </script>
+            <div class="col-md-12 customTitle">
+                <p>Localisation: Lausanne</p>
+            </div>
     @foreach($Parks as $Park)
-        <div class="col-md-6 text-center">
-            {!! link_to_route('showOne', 'Place N° '.$Park->parNumber, [$Park->idPark]) !!}
+        <div class="col-md-4 col-sm-6 text-center" style="margin-top: 80px">
+            {!! link_to_route('showOne', 'Place N° '.$Park->parNumber, [$Park->idPark],['class'=>'customButton']) !!}
         </div>
     @endforeach
         {!! $links !!}

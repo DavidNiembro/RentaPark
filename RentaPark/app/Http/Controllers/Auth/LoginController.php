@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 //use Illuminate\Foundation\Auth\AuthenticatesUsers;
+//Trait qui permet de faire la validation et le login de l'utilisateur à la place des fonctions native de Laravel.
 use Bestmomo\LaravelEmailConfirmation\Traits\AuthenticatesUsers;
+
 class LoginController extends Controller
 {
     /*
@@ -25,6 +27,7 @@ class LoginController extends Controller
      *
      * @var string
      */
+    //Renvoi vers le dashboard
     protected $redirectTo = '/dashboard';
 
     /**
@@ -36,6 +39,12 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
     }
+
+    /**
+     * Permet d'identifier un utilisateur avec son nom d'utilisateur au lieu de l'email
+     *
+     * @return useUsername
+     */
     public function username()
     {
         return 'useUsername';

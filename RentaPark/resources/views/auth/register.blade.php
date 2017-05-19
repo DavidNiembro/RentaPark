@@ -3,23 +3,23 @@
 @section('content')
 <div class="container">
     <div class="row">
+        <div class="col-md-8 col-md-offset-2 customTitle">
+            Register
+        </div>
+    </div>
+    <div class="row">
         <div class="col-md-8 col-md-offset-2">
-            <div class="panel panel-default">
-                <div class="panel-heading">Register</div>
-                <div class="panel-body">
                     @if (session('confirmation-success'))
                         <div class="alert alert-success">
                             {{ session('confirmation-success') }}
                         </div>
                     @else
-                        <form class="form-horizontal" role="form" method="POST" action="{{ url('/register') }}">
+                        <form role="form" method="POST" action="{{ url('/register') }}">
                             {{ csrf_field() }}
-
+                            <div>Données personnelles</div>
                             <div class="form-group{{ $errors->has('useName') ? ' has-error' : '' }}">
-                                <label for="useName" class="col-md-4 control-label">Nom</label>
-
-                                <div class="col-md-6">
-                                    <input id="useName" type="text" class="form-control" name="useName" value="{{ old('useName') }}" required autofocus>
+                                <div class="col-md-12">
+                                    <input id="useName" type="text" class="customInput" name="useName" value="{{ old('useName') }}" required autofocus placeholder="Nom">
 
                                     @if ($errors->has('useName'))
                                         <span class="help-block">
@@ -29,10 +29,8 @@
                                 </div>
                             </div>
                             <div class="form-group{{ $errors->has('useFirstName') ? ' has-error' : '' }}">
-                                <label for="useFirstName" class="col-md-4 control-label">Prénom</label>
-
-                                <div class="col-md-6">
-                                    <input id="useFirstName" type="text" class="form-control" name="useFirstName" value="{{ old('useFirstName') }}" required autofocus>
+                                <div class="col-md-12">
+                                    <input id="useFirstName" type="text" class="customInput" name="useFirstName" value="{{ old('useFirstName') }}" required autofocus placeholder="Prénom">
 
                                     @if ($errors->has('useFirstName'))
                                         <span class="help-block">
@@ -42,10 +40,8 @@
                                 </div>
                             </div>
                             <div class="form-group{{ $errors->has('useCity') ? ' has-error' : '' }}">
-                                <label for="useCity" class="col-md-4 control-label">Ville</label>
-
-                                <div class="col-md-6">
-                                    <input id="useCity" type="text" class="form-control" name="useCity" value="{{ old('useCity') }}" required autofocus>
+                                <div class="col-md-12">
+                                    <input id="useCity" type="text" class="customInput" name="useCity" value="{{ old('useCity') }}" required autofocus placeholder="Ville">
 
                                     @if ($errors->has('useCity'))
                                         <span class="help-block">
@@ -55,10 +51,10 @@
                                 </div>
                             </div>
                             <div class="form-group{{ $errors->has('useLand') ? ' has-error' : '' }}">
-                                <label for="useLand" class="col-md-4 control-label">Pays</label>
 
-                                <div class="col-md-6">
-                                    <input id="useLand" type="text" class="form-control" name="useLand" value="{{ old('useLand') }}" required autofocus>
+
+                                <div class="col-md-12">
+                                    <input id="useLand" type="text" class="customInput" name="useLand" value="{{ old('useLand') }}" required autofocus placeholder="Pays">
 
                                     @if ($errors->has('useLand'))
                                         <span class="help-block">
@@ -68,10 +64,9 @@
                                 </div>
                             </div>
                             <div class="form-group{{ $errors->has('usePictureProfil') ? ' has-error' : '' }}">
-                                <label for="usePictureProfil" class="col-md-4 control-label">Image Profil</label>
 
-                                <div class="col-md-6">
-                                    <input id="usePictureProfil" type="text" class="form-control" name="usePictureProfil" value="{{ old('usePictureProfil') }}" required autofocus>
+                                <div class="col-md-12">
+                                    <input id="usePictureProfil" type="text" class="customInput" name="usePictureProfil" value="{{ old('usePictureProfil') }}" required autofocus placeholder="Image de profil A changer">
 
                                     @if ($errors->has('usePictureProfil'))
                                         <span class="help-block">
@@ -80,11 +75,12 @@
                                     @endif
                                 </div>
                             </div>
+                            <div>Création du compte</div>
                             <div class="form-group{{ $errors->has('useUsername') ? ' has-error' : '' }}">
-                                <label for="useUsername" class="col-md-4 control-label">Nom d'utilisteur</label>
 
-                                <div class="col-md-6">
-                                    <input id="useUsername" type="text" class="form-control" name="useUsername" value="{{ old('useUsername') }}" required autofocus>
+
+                                <div class="col-md-12">
+                                    <input id="useUsername" type="text" class="customInput" name="useUsername" value="{{ old('useUsername') }}" required autofocus placeholder="Nom d'utilisateur">
 
                                     @if ($errors->has('useUsername'))
                                         <span class="help-block">
@@ -95,10 +91,10 @@
                             </div>
 
                             <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
-                                <label for="email" class="col-md-4 control-label">E-Mail Address</label>
 
-                                <div class="col-md-6">
-                                    <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required>
+
+                                <div class="col-md-12">
+                                    <input id="email" type="email" class="customInput" name="email" value="{{ old('email') }}" required placeholder="Email">
 
                                     @if ($errors->has('email'))
                                         <span class="help-block">
@@ -109,10 +105,10 @@
                             </div>
 
                             <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
-                                <label for="password" class="col-md-4 control-label">Password</label>
 
-                                <div class="col-md-6">
-                                    <input id="password" type="password" class="form-control" name="password" required>
+
+                                <div class="col-md-12">
+                                    <input id="password" type="password" class="customInput" name="password" required placeholder="Mot de passe">
 
                                     @if ($errors->has('password'))
                                         <span class="help-block">
@@ -123,17 +119,17 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="password-confirm" class="col-md-4 control-label">Confirm Password</label>
 
-                                <div class="col-md-6">
-                                    <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required>
+                                <div class="col-md-12">
+                                    <input id="password-confirm" type="password" class="customInput" name="password_confirmation" required placeholder="Confirmer le mot de passe">
                                 </div>
                             </div>
 
+
                             <div class="form-group">
-                                <div class="col-md-6 col-md-offset-4">
-                                    <button type="submit" class="btn btn-primary">
-                                        Register
+                                <div class="col-md-4 col-md-offset-6">
+                                    <button type="submit" class="btn  btn-danger">
+                                        S'enregister
                                     </button>
                                 </div>
                             </div>
@@ -142,6 +138,4 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
 @endsection

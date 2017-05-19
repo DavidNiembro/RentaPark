@@ -28,6 +28,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
+    //Renvoi vers le dashboard
     protected $redirectTo = '/dashboard';
 
     /**
@@ -68,6 +69,7 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        //Création d'un utilisteur avec les données validées en amont
         return User::create([
             'useUsername' => $data['useUsername'],
             'email' => $data['email'],

@@ -18,7 +18,7 @@ class ParkRepository
     private function save(Park $park, Array $inputs)
     {
         $response = \GoogleMaps::load('geocoding')
-            ->setParam (['address' => $inputs['parAddress'].', '.$inputs['parPostCode'].' '.$inputs['ParCity']])
+            ->setParam (['address' => $inputs['parAddress'].', '.$inputs['parPostCode'].' '.$inputs['parCity']])
             ->get();
 
         $result = json_decode($response);
@@ -29,7 +29,7 @@ class ParkRepository
         $park->parNumber = $inputs['parNumber'];
         $park->parAddress = $inputs['parAddress'];
         $park->parPostCode = $inputs['parPostCode'];
-        $park->ParCity = $inputs['ParCity'];
+        $park->ParCity = $inputs['parCity'];
         $park->parPrice = $inputs['parPrice'];
         $park->parCouvert = isset($inputs['parCouvert']);
         $park->parLatitude = $inputs['parLatitude'];

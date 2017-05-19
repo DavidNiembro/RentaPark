@@ -20,9 +20,9 @@
                         {!! Form::text('parPostCode', null, ['class' => 'form-control', 'placeholder' => 'NPA']) !!}
                         {!! $errors->first('parPostCode', '<small class="help-block">:message</small>') !!}
                     </div>
-                    <div class="form-group {!! $errors->has('ParCity') ? 'has-error' : '' !!}">
-                        {!! Form::text('ParCity', null, ['class' => 'form-control', 'placeholder' => 'Ville']) !!}
-                        {!! $errors->first('ParCity', '<small class="help-block">:message</small>') !!}
+                    <div class="form-group {!! $errors->has('parCity') ? 'has-error' : '' !!}">
+                        {!! Form::text('parCity', null, ['class' => 'form-control', 'placeholder' => 'Ville']) !!}
+                        {!! $errors->first('parCity', '<small class="help-block">:message</small>') !!}
                     </div>
                     <div class="form-group {!! $errors->has('parPrice') ? 'has-error' : '' !!}">
                         {!! Form::text('parPrice', null, ['class' => 'form-control', 'placeholder' => 'Prix par 1/2 Heure']) !!}

@@ -25,8 +25,4 @@ class HomeController extends Controller
     {
         return view('userProfile/dashboard');
     }
-    public function MyReservations()
-    {
-        return view('userProfile/myReservations');
-    }
 }

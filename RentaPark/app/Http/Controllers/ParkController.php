@@ -3,21 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Park;
+use App\Reservation;
 use Illuminate\Http\Request;
 use App\Repositories\ParkRepository;
 use App\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use MaddHatter\LaravelFullcalendar\Facades\Calendar;
 
 class ParkController extends Controller
 {
-    protected $user;
+    // Nombre d'éléments par pages
     protected $n = 10;
 
-    public function __construct(ParkRepository $parkRepository, User $user)
+    public function __construct(ParkRepository $parkRepository)
     {
         $this->parkRepository = $parkRepository;
-        $this->User = $user;
     }
     /**
      * Display a listing of the resource.
@@ -26,6 +27,7 @@ class ParkController extends Controller
      */
     public function index()
     {
+        //Récupère l'utilisateur qui est connecté
         $users = User::find(Auth::id());
 
         return view('userProfile/myPlaces', compact('users'));
@@ -51,7 +53,6 @@ class ParkController extends Controller
     {
         $park = $this->parkRepository->store($request->all());
 
-    // return redirect('user')->withOk("L'utilisateur " . $user->name . " a été créé.");
         return redirect('MyPlaces');
     }
 
@@ -65,7 +66,24 @@ class ParkController extends Controller
     {
         $Park = $this->parkRepository->getById($id);
 
-        return view('userProfile.showPark',  compact('Park'));
+
+        $events[] = \Calendar::event(
+            "Réservé", //event title
+            true, //full day event?
+            new \DateTime('2017-05-14'), //start time (you can also use Carbon instead of DateTime)
+            new \DateTime('2017-05-15') //end time (you can also use Carbon instead of DateTime)
+
+        );
+        $calendar = \Calendar::addEvents($events);
+
+
+        $calendar->setOptions([
+            'lang' => 'fr',
+        ]);
+
+        $Reservations = Reservation::all()->where('resStatus', 'En Attente')->where('fkPark', $id);
+
+        return view('userProfile.showPark',  compact('Park','calendar','Reservations'));
     }
 
     /**
@@ -88,7 +106,7 @@ class ParkController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $this->parkRepository->update($id, $request->all());
     }
 
     /**
@@ -99,28 +117,63 @@ class ParkController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $idUser = Auth::user()->getAuthIdentifier();
+
+        DB::table('t_park')
+            ->where('fkUser', $idUser)->where('idPark', $id)
+            ->update(['parDelete' => true]);
+        DB::table('t_reservation')
+            ->where('fkPark', $id)
+            ->update(['resDelete' => true]);
     }
 
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function search(){
-     $Parks = $this->parkRepository->getPaginate($this->n);
-        $links = $Parks->render();
 
-        return view('search.all', compact('Parks', 'links'));
+     $Parks = $this->parkRepository->getPaginate($this->n);
+     $links = $Parks->render();
+
+     return view('search.all', compact('Parks', 'links'));
     }
+
+    /**
+     * Renvoi à la page de la place de parc
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response Park et Calendar
+     */
     public function showOne($id)
     {
-        $Park = $this->parkRepository->getById($id);
+        $park = $this->parkRepository->getById($id);
 
-        $events[] = \Calendar::event(
-            "Valentine's Day", //event title
-            true, //full day event?
-            new \DateTime('2015-02-14'), //start time (you can also use Carbon instead of DateTime)
-            new \DateTime('2015-02-14'), //end time (you can also use Carbon instead of DateTime)
-            'stringEventId' //optionally, you can specify an event ID
-        );
-        $calendar = \Calendar::addEvents($events); //add an array with addEvents
+        //Récupère les réservations pour la place donnée
+        $reservations = Reservation::all()->where('fkPark', $id)->where('resStatus','Accepte');
 
-        return view('search.one',  compact('Park','calendar'));
+        //Tableau des évènenments
+        $events = [];
+
+        //Parcourt les réservations
+        foreach($reservations as $reservation){
+            $events[] = \Calendar::event(
+                "Réservé",
+                false,
+                $reservation->resStartingDate,
+                $reservation->resFinishDate
+            );
+        }
+
+        //Initialise un nouveau calendrier et ajoute les évènements
+        $calendar = \Calendar::addEvents($events);
+
+        $calendar->setOptions([
+            'lang' => 'fr',
+        ]);
+
+        return view('search.one',  compact('park','calendar'));
     }
 }

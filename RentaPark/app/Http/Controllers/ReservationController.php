@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\User;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Facades\DB;
 
 class ReservationController extends Controller
 {
@@ -95,6 +96,45 @@ class ReservationController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function changeStatus($id, $status, $start, $end){
+
+        $idUser = Auth::user()->getAuthIdentifier();
+
+        DB::table('t_reservation')
+            ->where('fkUser', $idUser)->where('fkPark', $id)->where('resStartingDate',$start)->where('resFinishDate',$end)
+            ->update(['resStatus' => $status]);
+        return back();
+        //$user = User::find($idUser);
+        //$user->parkreservation()->updateExistingPivot([$id =>['resStatus'=> $status]],false);
+    }
+
+    public function myReservationsIndex(){
+
+        $idUser = Auth::user()->getAuthIdentifier();
+        $Reservations = Reservation::all()->where('fkUser', $idUser)->where('resStatus','Accepte');
+        $events = [];
+        foreach($Reservations as $reservation){
+            $events[] = \Calendar::event(
+                "Réservé", //event title
+                false, //full day event?
+                $reservation->resStartingDate,
+                $reservation->resFinishDate
+
+            );
+        }
+
+        $calendar = \Calendar::addEvents($events);
+
+
+        $calendar->setOptions([ //set fullcalendar options
+            'locale'=> 'es',
+            'firstDay' => 1,
+        ]);
+
+
+        return view('userProfile/myReservations', compact('calendar'));
     }
 
 }

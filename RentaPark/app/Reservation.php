@@ -18,6 +18,11 @@ class Reservation extends Model
     ];
 
     public $timestamps = false;
+
+    public function user(){
+       return $this->hasMany('App\User',  'idUser','fkUser');
+    }
+
     public function park()
     {
         return $this->belongsToMany('App\Park', 't_reservation',
