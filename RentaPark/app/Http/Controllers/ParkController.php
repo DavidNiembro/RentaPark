@@ -10,6 +10,8 @@ use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use MaddHatter\LaravelFullcalendar\Facades\Calendar;
+use App\Http\Requests\ParkCreateRequest;
+use App\Http\Requests\ParkUpdateRequest;
 
 class ParkController extends Controller
 {
@@ -21,7 +23,7 @@ class ParkController extends Controller
         $this->parkRepository = $parkRepository;
     }
     /**
-     * Display a listing of the resource.
+     * Renvoi vers la pages des places d'un utilisateur
      *
      * @return \Illuminate\Http\Response
      */
@@ -34,26 +36,30 @@ class ParkController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Renvoi vers la page de création de place de parc
      *
      * @return \Illuminate\Http\Responses
      */
     public function create()
     {
+        //Renvoi vers la vue de création de place de parc
         return view('park/create');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Création d'une place de parc
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ParkCreateRequest $request)
     {
+        //Création de la place de parc avec le repository
         $park = $this->parkRepository->store($request->all());
 
-        return redirect('MyPlaces');
+        //Renvoi vers la vue des places de l'utilisateur avec un message de confirmation.
+        return redirect('MyPlaces')->withOk("La place a été créé avec succès.");
+
     }
 
     /**
@@ -64,23 +70,34 @@ class ParkController extends Controller
      */
     public function show($id)
     {
+        //Récupération d'une place avec l'id
         $Park = $this->parkRepository->getById($id);
 
+        //Récupération des réservation de la place de parc qui sont déjà accepté
+        $reservationsAccepted = Reservation::all()->where('fkPark', $id)->where('resStatus','Accepte');
 
-        $events[] = \Calendar::event(
-            "Réservé", //event title
-            true, //full day event?
-            new \DateTime('2017-05-14'), //start time (you can also use Carbon instead of DateTime)
-            new \DateTime('2017-05-15') //end time (you can also use Carbon instead of DateTime)
+        //Tableau des évènenments
+        $events = [];
 
-        );
+        //Parcourt les réservations et les insères dans le tableau d'événement
+        foreach($reservationsAccepted as $reservationAccepted){
+            $events[] = \Calendar::event(
+                "Réservé",
+                false,
+                $reservationAccepted->resStartingDate,
+                $reservationAccepted->resFinishDate
+            );
+        }
+
+        //Création d'un calendrier avec les événements en paramètres
         $calendar = \Calendar::addEvents($events);
 
-
+        //Ajout d'options dans le calendrier
         $calendar->setOptions([
             'lang' => 'fr',
         ]);
 
+        //Récupération des résérvations qui sont en attente pour la place
         $Reservations = Reservation::all()->where('resStatus', 'En Attente')->where('fkPark', $id);
 
         return view('userProfile.showPark',  compact('Park','calendar','Reservations'));
@@ -104,9 +121,12 @@ class ParkController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(ParkUpdateRequest $request, $id)
     {
-        $this->parkRepository->update($id, $request->all());
+        //Modification de la place en passant par le repository
+        $park = $this->parkRepository->update($id, $request->all());
+
+        return redirect('MyPlaces')->withOk("La place a été modifié avec succès.");
     }
 
     /**
@@ -117,14 +137,21 @@ class ParkController extends Controller
      */
     public function destroy($id)
     {
+        //Récupère l'id de l'utilisateur connecté
         $idUser = Auth::user()->getAuthIdentifier();
 
+        //Supprime la place de park
         DB::table('t_park')
             ->where('fkUser', $idUser)->where('idPark', $id)
             ->update(['parDelete' => true]);
+
+        //Supprime les réservation de la place de parc
         DB::table('t_reservation')
             ->where('fkPark', $id)
             ->update(['resDelete' => true]);
+
+        //Retourne à la page des places
+        return redirect('MyPlaces')->withOk("La place a été supprimé avec succès.");
     }
 
     /**
@@ -133,12 +160,35 @@ class ParkController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function search(){
+    public function search(Request $request){
 
-     $Parks = $this->parkRepository->getPaginate($this->n);
-     $links = $Parks->render();
+        $inputs= array_merge($request->all());
+        $Localisation = $inputs['ville'];
 
-     return view('search.all', compact('Parks', 'links'));
+        $Parks = $this->parkRepository->getPaginate($this->n);
+        $links = $Parks->render();
+
+
+        $response = \GoogleMaps::load('geocoding')
+            ->setParam (['address' => $Localisation])
+            ->get();
+
+        $result = json_decode($response);
+        if(!empty($result->results)){
+
+
+            $json = $result->results[0];
+            $maps['parLatitude'] = (string) $json->geometry->location->lat;
+            $maps['parLongitude'] = (string) $json->geometry->location->lng;
+
+            return view('search.all', compact('Parks', 'links','Localisation','maps'));
+        }else
+        {
+
+            return view('search.all', compact('Parks', 'links'));
+
+        }
+
     }
 
     /**

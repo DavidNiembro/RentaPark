@@ -25,7 +25,7 @@ class Park extends Model
     public $timestamps = false;
 
     public function user(){
-        $this->belongsTo('App\User','idUser', 'fkUser');
+        return $this->belongsTo('App\User','fkUser','idUser');
     }
     public function userreservation()
     {

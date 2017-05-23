@@ -17,13 +17,19 @@ class ParkRepository
 
     private function save(Park $park, Array $inputs)
     {
+        //Récupération des coordonnées d'une adresse en utilisant l'API de Google
         $response = \GoogleMaps::load('geocoding')
             ->setParam (['address' => $inputs['parAddress'].', '.$inputs['parPostCode'].' '.$inputs['parCity']])
             ->get();
 
+        //Décodage de la réponse en json
         $result = json_decode($response);
         $json = $result->results[0];
+
+        //Récupération de la latitude
         $inputs['parLatitude'] = (string) $json->geometry->location->lat;
+
+        //Récupération de la longitude
         $inputs['parLongitude'] = (string) $json->geometry->location->lng;
 
         $park->parNumber = $inputs['parNumber'];
@@ -34,6 +40,7 @@ class ParkRepository
         $park->parCouvert = isset($inputs['parCouvert']);
         $park->parLatitude = $inputs['parLatitude'];
         $park->parLongitude = $inputs['parLongitude'];
+        $park->parDelete = 0;
         $park->fkUser = Auth::id();
 
         $park->save();

@@ -16,7 +16,7 @@
         </div>
         <div class="row">
             <div class="container">
-                <ul class="nav nav-pills">
+                <ul class="nav nav-pills ">
                     <li class="active"><a data-toggle="pill" href="#home">En Attente</a></li>
                     <li><a data-toggle="pill" href="#menu1">Modifier</a></li>
 

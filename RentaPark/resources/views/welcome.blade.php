@@ -85,9 +85,11 @@
             <div class="content">
                 <div class="title m-b-md">
                     <div style="width: 60%;margin-left: auto;margin-right: auto">
+                        {!! Form::open(['route' => 'search']) !!}
                         <p style="font-size: 30px">Avec RentaPark, cherchez, trouvez et louez les places de particulier en un clic</p>
-                        <input type="text" class="customInput" placeholder="Ville">
-                        <a href="{{ url('/search') }}" style="font-size: medium" class="btn btn-danger">Chercher</a>
+                                    <input type='text' class="customInput" name="ville" placeholder="Ville"/>
+                        {!! Form::submit('Chercher', ['class' => 'btn btn-danger']) !!}
+                        {!! Form::close() !!}
                     </div>
                 </div>
             </div>

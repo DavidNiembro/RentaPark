@@ -27,8 +27,8 @@ class User extends Authenticatable
         'useName',
         'useCity',
         'useLand',
-        'useToken',
-        'useVerified',
+        'confirmed',
+        'confirmation_code',
         'useDelete',
     ];
 

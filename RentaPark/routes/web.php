@@ -22,7 +22,7 @@ Route::get('confirmation/{id}/{token}', 'Auth\RegisterController@confirm');
 Route::get('/dashboard', 'HomeController@dashboard')->name('dashboard');
 Route::get('/MyPlaces', 'ParkController@index')->name('MyPlaces');
 Route::get('/MyReservations', 'ReservationController@myReservationsIndex')->name('MyReservations');
-Route::get('/search', 'ParkController@search')->name('search');
+Route::post('/search', 'ParkController@search')->name('search');
 Route::get('/showOne/{i}', 'ParkController@showOne')->name('showOne');
 
 Route::resource('park', 'ParkController');

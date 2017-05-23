@@ -18,11 +18,11 @@ class CreateTUserTable extends Migration
             $table->string('useUsername', 30)->unique();
             $table->string('password');
             $table->string('usePictureProfil')->nullable();
-            $table->string('email')->nullable();
-            $table->string('useName')->nullable();
-            $table->string('useFirstName')->nullable();
-            $table->string('useCity')->nullable();
-            $table->string('useLand')->nullable();
+            $table->string('email');
+            $table->string('useName');
+            $table->string('useFirstName');
+            $table->string('useCity');
+            $table->string('useLand');
             $table->boolean('confirmed')->default(false);
             $table->string('confirmation_code')->nullable();
             $table->boolean('useDelete')->nullable();
