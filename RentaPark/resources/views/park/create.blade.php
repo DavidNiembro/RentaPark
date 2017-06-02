@@ -1,9 +1,19 @@
+<!--
+    Auteur: David Niembro
+    Date:
+    Description Formulaire de création de la place de parc
+    -->
 @extends('layouts.app')
 
 @section('content')
     <div class="container">
         <div class="col-sm-offset-2 col-sm-8 customTitle">
                 Ajoutez une nouvelle place
+        </div>
+        <div class="col-sm-offset-4 col-sm-4">
+            @if(session()->has('ok'))
+                <div class="alert alert-danger alert-dismissible">{!! session('ok') !!}</div>
+            @endif
         </div>
         <div class="col-sm-offset-2 col-sm-8">
             {!! Form::open(['route' => 'park.store']) !!}

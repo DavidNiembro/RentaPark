@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * ETML
+ * Auteur: David Niembro
+ * Date:
+ * Description: Contient les fonctions pour la gestion des places de parc
+ */
+
 namespace App\Http\Controllers;
 
 use App\Park;
@@ -22,13 +29,15 @@ class ParkController extends Controller
     {
         $this->parkRepository = $parkRepository;
     }
+
     /**
      * Renvoi vers la pages des places d'un utilisateur
      *
-     * @return \Illuminate\Http\Response
+     * @return La vue myPlaces et la variable users
      */
     public function index()
     {
+
         //Récupère l'utilisateur qui est connecté
         $users = User::find(Auth::id());
 
@@ -38,7 +47,7 @@ class ParkController extends Controller
     /**
      * Renvoi vers la page de création de place de parc
      *
-     * @return \Illuminate\Http\Responses
+     * @return La vue create
      */
     public function create()
     {
@@ -49,24 +58,41 @@ class ParkController extends Controller
     /**
      * Création d'une place de parc
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  $request, Variable qui contient toutes les valeurs du formaulaire
+     * @return La vue  MyPlaces
      */
     public function store(ParkCreateRequest $request)
     {
-        //Création de la place de parc avec le repository
-        $park = $this->parkRepository->store($request->all());
+        //Est-ce que l'utilisateur a déjà 2 places
+        if(count(Park::all()->where('fkUser',Auth::id())->where('parDelete',0))<2)
+        {
+            //Création de la place de parc avec le repository
+            $park = $this->parkRepository->store($request->all());
 
-        //Renvoi vers la vue des places de l'utilisateur avec un message de confirmation.
-        return redirect('MyPlaces')->withOk("La place a été créé avec succès.");
+            //Si l'adresse n'a pas pu être localisé
+            if ($park==false){
 
+                //Renvoi vers la vue des places de l'utilisateur avec un message d'erreur.
+                return redirect('park/create')->withOk("L'adresse est introuvable. Veuillez la corriger");
+
+            }else{
+
+                //Renvoi vers la vue des places de l'utilisateur avec un message de confirmation.
+                return redirect('MyPlaces')->withOk("La place a été créé avec succès.");
+            }
+        }
+        else{
+
+            //Renvoi vers la vue des places de l'utilisateur avec un message d'erreur.
+            return redirect('MyPlaces')->withOk("Vous ne pouvez pas avoir plus de 2 places");
+        }
     }
 
     /**
-     * Display the specified resource.
+     * Affichage de la place
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  $id, id de la place à afficher
+     * @return La vue showPark, Variable Park, calednar et Reservations
      */
     public function show($id)
     {
@@ -92,11 +118,6 @@ class ParkController extends Controller
         //Création d'un calendrier avec les événements en paramètres
         $calendar = \Calendar::addEvents($events);
 
-        //Ajout d'options dans le calendrier
-        $calendar->setOptions([
-            'lang' => 'fr',
-        ]);
-
         //Récupération des résérvations qui sont en attente pour la place
         $Reservations = Reservation::all()->where('resStatus', 'En Attente')->where('fkPark', $id);
 
@@ -115,25 +136,33 @@ class ParkController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Modification de la place
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  $request, Valeur des champs du formulaire soumis.
+     * @param  $id, id de la place à modifier
+     * @return La vue MyPlaces
      */
     public function update(ParkUpdateRequest $request, $id)
     {
         //Modification de la place en passant par le repository
         $park = $this->parkRepository->update($id, $request->all());
+        if ($park == false) {
 
-        return redirect('MyPlaces')->withOk("La place a été modifié avec succès.");
+            //Renvoi vers la vue des places de l'utilisateur avec un message d'erreur.
+            return redirect('MyPlaces')->withOk("L'adresse est introuvable");
+
+        } else {
+
+            //Renvoi vers la vue des places de l'utilisateur avec un message de confirmation.
+            return redirect('MyPlaces')->withOk("La place a été modifié avec succès.");
+        }
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Suppression de la place et des réservations associés
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  $id, ID de la place de parc
+     * @return La vue MyPlaces
      */
     public function destroy($id)
     {
@@ -155,54 +184,58 @@ class ParkController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Recherche de toutes les places de parc
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  $request valeur du champs de recherche.
+     * @return La vue all. Variable Parks, links, Localisation, maps
      */
-    public function search(Request $request){
-
+    public function search(Request $request)
+    {
+        //Récupération des champs envoyé
         $inputs= array_merge($request->all());
+
+        //Récupération de la valeur du champs ville
         $Localisation = $inputs['ville'];
 
+        //Récupération des places de park
         $Parks = $this->parkRepository->getPaginate($this->n);
         $links = $Parks->render();
 
-
+        //Récupération des coordonnée de la ville passée en paramètre
         $response = \GoogleMaps::load('geocoding')
             ->setParam (['address' => $Localisation])
             ->get();
-
         $result = json_decode($response);
+
+        //L'adresse existe pas ou le champs n'est pas vide
         if(!empty($result->results)){
 
-
             $json = $result->results[0];
+
+            //Récupération de la latitude et la longitude
             $maps['parLatitude'] = (string) $json->geometry->location->lat;
             $maps['parLongitude'] = (string) $json->geometry->location->lng;
 
             return view('search.all', compact('Parks', 'links','Localisation','maps'));
-        }else
-        {
-
-            return view('search.all', compact('Parks', 'links'));
-
         }
-
+        else
+        {
+            return view('search.all', compact('Parks', 'links'));
+        }
     }
 
     /**
      * Renvoi à la page de la place de parc
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response Park et Calendar
+     * @param  $id, id de la place à afficher.
+     * @return La vue one, Variable park et calendar
      */
     public function showOne($id)
     {
         $park = $this->parkRepository->getById($id);
 
         //Récupère les réservations pour la place donnée
-        $reservations = Reservation::all()->where('fkPark', $id)->where('resStatus','Accepte');
+        $reservations = Reservation::all()->where('fkPark', $id)->where('resStatus','Accepte')->where('resDelete',0);
 
         //Tableau des évènenments
         $events = [];
@@ -219,10 +252,6 @@ class ParkController extends Controller
 
         //Initialise un nouveau calendrier et ajoute les évènements
         $calendar = \Calendar::addEvents($events);
-
-        $calendar->setOptions([
-            'lang' => 'fr',
-        ]);
 
         return view('search.one',  compact('park','calendar'));
     }

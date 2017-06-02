@@ -1,4 +1,10 @@
 <?php
+/**
+ * ETML
+ * Auteur: David Niembro
+ * Date:
+ * Description: Contient la fonction de validation
+ */
 
 namespace App\Http\Requests;
 
@@ -25,6 +31,8 @@ class ParkUpdateRequest extends FormRequest
     {
         $id = $this->Park;
         return [
+
+            //champs à valider avec les spécifications
             'parNumber' => 'required|max:20'. $id,
             'parAddress' => 'required|max:255'. $id,
             'parPostCode' => 'required'. $id,

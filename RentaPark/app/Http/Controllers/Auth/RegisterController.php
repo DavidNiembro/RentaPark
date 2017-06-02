@@ -58,6 +58,7 @@ class RegisterController extends Controller
             'useFirstName' => 'required',
             'useCity' => 'required',
             'useLand' => 'required',
+            'usePictureProfil' => 'required|image',
         ]);
     }
 
@@ -69,12 +70,18 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        //Création d'un nom pour l'image
+        $photoName = time().'.'.$data['usePictureProfil']->getClientOriginalExtension();
+
+        //Déplacement de l'image dans le dossier voulu
+        $data['usePictureProfil']->move(public_path('imagesProfil'), $photoName);
+
         //Création d'un utilisteur avec les données validées en amont
         return User::create([
             'useUsername' => $data['useUsername'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
-            'usePictureProfil' => $data['usePictureProfil'],
+            'usePictureProfil' => $photoName,
             'useName' => $data['useName'],
             'useFirstName' => $data['useFirstName'],
             'useCity' => $data['useCity'],

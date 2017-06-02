@@ -1,4 +1,10 @@
 <?php
+/**
+ * ETML
+ * Auteur: David Niembro
+ * Date:
+ * Description: Fichier des routes pour l'application web
+ */
 
 /*
 |--------------------------------------------------------------------------
@@ -28,4 +34,7 @@ Route::get('/showOne/{i}', 'ParkController@showOne')->name('showOne');
 Route::resource('park', 'ParkController');
 Route::resource('reservation', 'ReservationController');
 
-Route::put('/reservation/status/{id}/{status}/{start}/{end}', 'ReservationController@changeStatus')->name('changeStatus');
+Route::put('/reservation/status/{id}/{idUser}/{status}/{start}/{end}', 'ReservationController@changeStatus')->name('changeStatus');
+Route::put('/reservation/edit/{id}/{idUser}/{start}/{end}', 'ReservationController@reservationEditStore')->name('reservationEditStore');
+Route::post('/reservation/reservationEdit', 'ReservationController@reservationEdit')->name('reservationEdit');
+Route::post('/reservation/reservationDestroy/{id}/{idUser}/{start}/{end}', 'ReservationController@reservationDestroy')->name('reservationDestroy');

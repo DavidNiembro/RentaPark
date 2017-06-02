@@ -1,5 +1,10 @@
 <?php
-
+/**
+ * ETML
+ * Auteur: David Niembro
+ * Date:
+ * Description: Fichier de création et suppression de la table dans la base de données
+ */
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;

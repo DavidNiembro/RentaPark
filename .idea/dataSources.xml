@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DataSourceManagerImpl" format="xml" hash="3469918908">
+  <component name="DataSourceManagerImpl" format="xml" hash="417254170">
     <data-source source="LOCAL" name="MySQL - rentapark@rentapark.section-inf.ch" uuid="9f47250a-7c01-4c01-9194-f3e13a39b210">
       <driver-ref>mysql</driver-ref>
       <synchronize>true</synchronize>

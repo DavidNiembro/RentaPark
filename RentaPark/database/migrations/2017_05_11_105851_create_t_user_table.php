@@ -1,5 +1,10 @@
 <?php
-
+/**
+ * ETML
+ * Auteur: David Niembro
+ * Date:
+ * Description: Fichier de création et suppression de la table dans la base de données
+ */
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -17,7 +22,7 @@ class CreateTUserTable extends Migration
             $table->increments('idUser');
             $table->string('useUsername', 30)->unique();
             $table->string('password');
-            $table->string('usePictureProfil')->nullable();
+            $table->string('usePictureProfil');
             $table->string('email');
             $table->string('useName');
             $table->string('useFirstName');

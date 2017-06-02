@@ -3,6 +3,11 @@
     font-weight: 200;
     padding-bottom: 20px;
 }
+.customText{
+    font-size: 30px;
+    font-weight: 200;
+
+}
 .customInput{
     border: none;
     border-bottom: 1px solid grey;
@@ -32,4 +37,34 @@
 .customButton:hover{
     color: red;
     text-decoration: none;
+}
+.input-group-addon{
+    background-color: white !important;
+    border:none !important;
+    border-bottom: 1px solid grey !important;
+    border-radius: 0px !important;
+}
+.nav-pills > li.active > a{
+    color: red !important ;
+    background-color: white !important;
+    border-bottom: 1px solid red !important;
+    border-radius: 0px !important;
+}
+.nav > li > a:hover{
+    background-color:white !important;
+    color: red !important;
+}
+.nav > li > a{
+    font-size: 25px;
+    font-weight: 200;
+    color: grey;
+}
+.customButtonReservation{
+    border:2px solid red;
+    font-weight: 200;
+    background-color: transparent;
+    color: red;
+    font-size: 25px;
+    text-decoration: none;
+    padding: 10px;
 }

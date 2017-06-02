@@ -1,8 +1,16 @@
 <?php
 
+/**
+ * ETML
+ * Auteur: David Niembro
+ * Date:
+ * Description: Contient les fonctions pour la page Dashboard
+ */
+
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\User;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
@@ -17,12 +25,13 @@ class HomeController extends Controller
     }
 
     /**
-     * Show the application dashboard.
+     * Affiche la page Dashboard
      *
-     * @return \Illuminate\Http\Response
+     * @return la vue Dashboard avec la variable user
      */
     public function dashboard()
     {
-        return view('userProfile/dashboard');
+        $user = User::find(Auth::id());
+        return view('userProfile/dashboard', compact('user'));
     }
 }

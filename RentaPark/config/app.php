@@ -1,4 +1,10 @@
 <?php
+/**
+ * ETML
+ * Auteur: David Niembro
+ * Date:
+ * Description: Fichier de config de Laravel
+ */
 
 return [
 
@@ -38,7 +44,7 @@ return [
     |
     */
 
-    'debug' => env('APP_DEBUG', false),
+    'debug' => env('APP_DEBUG', true),
 
     /*
     |--------------------------------------------------------------------------
@@ -51,7 +57,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'http://rentapark.section-inf.ch/RentaPark/public/'),
 
     /*
     |--------------------------------------------------------------------------

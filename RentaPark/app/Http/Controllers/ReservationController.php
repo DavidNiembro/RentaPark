@@ -1,4 +1,12 @@
 <?php
+
+/**
+ * ETML
+ * Auteur: David Niembro
+ * Date:
+ * Description: Contient les fonctions pour la gestion des réservations
+ */
+
 namespace App\Http\Controllers;
 
 use App\Park;
@@ -9,15 +17,16 @@ use App\User;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Carbon\Carbon;
 
 class ReservationController extends Controller
 {
-
 
     public function __construct()
     {
 
     }
+
     /**
      * Display a listing of the resource.
      *
@@ -39,15 +48,23 @@ class ReservationController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Création d'une réservation
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  $request, Valeur des champs du formulaire soumis
+     * @return
      */
     public function store(Request $request)
     {
         //Création d'un tableau avec toutes les valeurs reçues
         $inputs = array_merge($request->all());
+
+
+        //Tranformation des dates en timestamp
+        $start = new Carbon($inputs['Start']);
+        $start = $start->getTimestamp();
+
+        $end = new Carbon($inputs['End']);
+        $end = $end->getTimestamp();
 
         //Récupération de l'id de la personne qui est connecté
         $idUser = Auth::user()->getAuthIdentifier();
@@ -61,23 +78,55 @@ class ReservationController extends Controller
         //Récupération de l'utilisateur avec son ID
         $user = User::find($idUser);
 
-        //Création de la réservation en la mettant en attente
-        $user->parkreservation()->attach($inputs['PlaceID'], ['resStartingDate' => $inputs['Start'],'resFinishDate' => $inputs['End'],'resDelete'=> false, 'resStatus'=>'En Attente']);
+        //Récupération des réservations déjà accepté
+        $reservationsToTest = Reservation::all()->where('resStatus','Accepte');
 
-        //Création du mail
-        $title = "Réservation de votre place";
-        $content = "je suis le contenu du mail ". + $Park->parNumber;
-        $user_email = $email;
-        $user_name = "nom du destinataire";
-
-        //Envoi du mail
-        $data = ['email'=> $user_email,'name'=> $user_name,'subject' => $title, 'content' => $content];
-        Mail::send('park/confirmMail', $data, function($message) use($data)
+        foreach($reservationsToTest as $reservationToTest)
         {
-            $subject=$data['subject'];
-            $message->from('info@test.ch');
-            $message->to($data['email'], 'test.ch')->subject($subject);
-        });
+            //Tranformation des dates en timestamp
+            $startToTest = new Carbon($reservationToTest['resStartingDate']);
+            $startToTest = $startToTest->getTimestamp();
+
+            $FinishToTest = new Carbon($reservationToTest['resFinishDate']);
+            $FinishToTest = $FinishToTest->getTimestamp();
+
+            //Verification que la nouvelle réservation ne gêne pas une autre pour la même place
+            if($end<$startToTest||($end>$FinishToTest && $start>$FinishToTest)){
+
+            }else
+            {
+                return redirect('showOne/'.$inputs['PlaceID'])->withOk("Une autre réservation est déjà prévue dans cette tranche horaires. Veuillez vous référer au calendrier des réservations");
+            }
+        }
+
+        if($idUser==$Park['fkUser']){
+
+            //Création de la réservation en la mettant en accepté
+            $user->parkreservation()->attach($inputs['PlaceID'], ['resStartingDate' => $inputs['Start'],'resFinishDate' => $inputs['End'],'resDelete'=> false, 'resStatus'=>'Accepte']);
+
+            return back();
+
+        }else{
+
+            //Création de la réservation en la mettant en attente
+            $user->parkreservation()->attach($inputs['PlaceID'], ['resStartingDate' => $inputs['Start'],'resFinishDate' => $inputs['End'],
+                'resDelete'=> false, 'resStatus'=>'En Attente']);
+
+            //Création du mail
+            $title = "Réservation de votre place";
+            $user_email = $email;
+
+            //Envoi du mail
+            $data = ['email'=> $user_email,'subject' => $title];
+            Mail::send('park/confirmMail', $data, function($message) use($data)
+            {
+                $subject=$data['subject'];
+                $message->from('info@rentapark.section-inf.ch');
+                $message->to($data['email'], 'Rentapark.section-inf.ch')->subject($subject);
+            });
+
+            return back();
+        }
     }
 
     /**
@@ -126,15 +175,12 @@ class ReservationController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Changement du status
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  $id , $idUser, $status, $start, $end
+     * @return
      */
-    public function changeStatus($id, $status, $start, $end){
-
-        //Récupération de l'ID de l'utilisateur connecté
-        $idUser = Auth::user()->getAuthIdentifier();
+    public function changeStatus($id, $idUser, $status, $start, $end){
 
         //Changement du status dans la base de données
         DB::table('t_reservation')
@@ -145,10 +191,9 @@ class ReservationController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Affiche les réservations de l'utilisateur.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Vue MyReservations, Variables calendar, Reservations
      */
     public function myReservationsIndex(){
 
@@ -156,7 +201,7 @@ class ReservationController extends Controller
         $idUser = Auth::user()->getAuthIdentifier();
 
         //Récupération des réservation de l'utilisateur qui ont été accepté
-        $Reservations = Reservation::all()->where('fkUser', $idUser)->where('resStatus','Accepte');
+        $Reservations = Reservation::all()->where('fkUser', $idUser)->where('resStatus','Accepte')->where('resDelete', 0);
 
         //Création d'un tableau d'événement
         $events = [];
@@ -180,15 +225,111 @@ class ReservationController extends Controller
         //Option suplémentaires pour le calendrier
         $calendar->setOptions([ //set fullcalendar options
 
-            //Langue du calendrier.
-            'locale'=> 'es',
-
             //Le premier jour doit commencer par 1
             'firstDay' => 1,
         ]);
 
-
-        return view('userProfile/myReservations', compact('calendar'));
+        return view('userProfile/myReservations', compact('calendar','Reservations'));
     }
 
+    /**
+     * Affiche la page de modification.
+     * @param $request, Valeur de la réservation à modifier
+     * @return vue myReservationsEdit, Variable Reservations.
+     */
+    public function reservationEdit(Request $request){
+
+        $inputs = array_merge($request->all());
+
+        //Récupération de la réservation.
+        $Reservations = Reservation::all()->where('fkUser', $inputs['fkUser'])->where('fkPark', $inputs['fkPark'])->where('resStartingDate',$inputs['start'])->where('resFinishDate',$inputs['end'])->where('resDelete',0);
+
+        return view('userProfile/myReservationsEdit',  compact('Reservations'));
+
+    }
+
+    /**
+     * Récupère les valeurs du formulaire de modifacation est les persistes dans la base
+     * @param $id, ID de la place
+     * @param $idUser ID du propriétaire
+     * @param $start Ancienne date de début de la réservation
+     * @param $end Ancienne date de Fin de la réservation
+     * @param $request Valeur du formulaire de modification
+     * @return Route MyReservation
+     */
+    public function reservationEditStore($id, $idUser, $start, $end, Request $request){
+
+        //Récupération de l'id de la personne qui est connecté
+        $idUserAuth = Auth::user()->getAuthIdentifier();
+
+        $inputs = array_merge($request->all());
+
+        //Transformation de la date en TimeStamp
+        $startOld = new Carbon($start);
+        $startOld = $startOld->getTimestamp();
+
+        $endOld = new Carbon($end);
+        $endOld = $endOld->getTimestamp();
+
+        $startCheck = new Carbon($inputs['Start']);
+        $startCheck = $startCheck->getTimestamp();
+
+        $endCheck = new Carbon($inputs['End']);
+        $endCheck = $endCheck->getTimestamp();
+
+        //Récupération des réservation accepté
+        $reservationsToTest = Reservation::all()->where('resStatus','Accepte');
+
+        //Parcours les réservations
+        foreach($reservationsToTest as $reservationToTest)
+        {
+            //Transforme les date en timeStamp
+            $startToTest = new Carbon($reservationToTest['resStartingDate']);
+            $startToTest = $startToTest->getTimestamp();
+
+            $FinishToTest = new Carbon($reservationToTest['resFinishDate']);
+            $FinishToTest = $FinishToTest->getTimestamp();
+
+            //? Réservation valable
+            if($startToTest==$startOld && $FinishToTest==$endOld){
+
+            }else{
+
+                if($endCheck<$startToTest||($endCheck>$FinishToTest && $startCheck>$FinishToTest)){
+
+                }else
+                {
+                    //return redirect()->back()->withOk("Une autre réservation est déjà prévue dans cette tranche horaires. Veuillez vous référer au calendrier des réservations");
+                    return redirect('MyReservations');
+                }
+            }
+        }
+
+        //Si le propriétaire est le locataire
+        if($idUserAuth==$idUser){
+            DB::table('t_reservation')
+                ->where('fkPark', $id)->where('fkUser', $idUser)->where('resStartingDate',$start)->where('resFinishDate',$end)
+                ->update(['resStartingDate'=> $inputs['Start'],'resFinishDate'=> $inputs['End'], 'resStatus'=>'Accepte']);
+        }else{
+            DB::table('t_reservation')
+                ->where('fkPark', $id)->where('fkUser', $idUser)->where('resStartingDate',$start)->where('resFinishDate',$end)
+                ->update(['resStartingDate'=> $inputs['Start'],'resFinishDate'=> $inputs['End'], 'resStatus'=>'En Attente']);
+        }
+
+        return redirect('MyReservations');
+    }
+
+    /**
+     * Suppression de la place
+     * @param $id, id de la place
+     * @param $idUser, id de l'utilisateur
+     * @param $start, Date de début
+     * @param $end, Date de fin
+     */
+    public function reservationDestroy($id, $idUser, $start, $end){
+
+        DB::table('t_reservation')
+            ->where('fkPark', $id)->where('fkUser', $idUser)->where('resStartingDate',$start)->where('resFinishDate',$end)
+            ->update(['resDelete'=> 1 ]);
+    }
 }
